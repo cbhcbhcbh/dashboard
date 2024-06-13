@@ -103,11 +103,23 @@ export async function GET(request: Request): Promise<NextResponse> {
         const returnData: DataProps[] = []
         const returnJson: { [key: string]: DataPoint[] } = {}
 
+        const anotherData: PerceptionDataProps[] = []
+        const anotherJson: { [key: string]: PerceptionDataPoint[] } = {}
+
         pricetrackings.map((pricetracking) => {
+
+            const newDAC: number = pricetracking.newDAC
+
             if (!returnJson["newDAC"]) {
                 returnJson["newDAC"] = [];
             }
-            (returnJson["newDAC"] as { x: String, y: number }[]).push({ x: getDateString(pricetracking.date), y: pricetracking.newDAC })
+            (returnJson["newDAC"] as { x: String, y: number }[]).push({ x: getDateString(pricetracking.date), y: newDAC })
+
+            if (!anotherJson["newDAC"]) {
+                anotherJson["newDAC"] = [];
+            }
+            (anotherJson["newDAC"] as PerceptionDataPoint[]).push({ x: getDateString(pricetracking.date), y: 1 })
+
             const resellerObject = pricetracking.reseller as Prisma.JsonObject
             const resellerJson = JSON.parse(JSON.parse(JSON.stringify(resellerObject)))
             Object.entries(resellerJson).forEach(([key, value]) => {
@@ -119,7 +131,16 @@ export async function GET(request: Request): Promise<NextResponse> {
                         }
                         console.log(`Object key2: ${key2}, value2:`, value2);
                         if (value2 !== undefined && typeof value2 === 'number') {
-                            (returnJson[key2] as { x: String, y: number }[]).push({ x: getDateString(pricetracking.date), y: value2 })
+                            (returnJson[key2] as { x: string, y: number }[]).push({ x: getDateString(pricetracking.date), y: value2 })
+                        }
+
+
+                        if (!anotherJson[key2]) {
+                            anotherJson[key2] = [];
+                        }
+                        console.log(`Object key2: ${key2}, value2:`, value2);
+                        if (value2 !== undefined && typeof value2 === 'number') {
+                            (anotherJson[key2] as PerceptionDataPoint[]).push({ x: getDateString(pricetracking.date), y: value2 / newDAC })
                         }
                     });
                 }
@@ -143,7 +164,23 @@ export async function GET(request: Request): Promise<NextResponse> {
 
         console.log(`returnData: ${returnData}`)
 
-        return NextResponse.json({ status: 200, revalidated: true, now: Date.now(), data: returnData });
+        Object.entries(anotherJson).forEach(([key, value]) => {
+            const tempDataProps: PerceptionDataProps = {
+                id: '',
+                data: []
+            };
+
+            if (!tempDataProps.id && tempDataProps.id !== key) {
+                tempDataProps.id = key
+                tempDataProps.data = value
+            }
+
+            anotherData.push(tempDataProps)
+        })
+
+        console.log(`anotherData: ${anotherData}`)
+
+        return NextResponse.json({ status: 200, revalidated: true, now: Date.now(), data: { returnData: returnData, anotherData: anotherData } });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ status: 303, revalidated: true, now: Date.now() });

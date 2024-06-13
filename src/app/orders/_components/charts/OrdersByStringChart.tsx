@@ -29,7 +29,7 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { MyResponsiveLineBump } from '@/components/LineChart'
+import { MyResponsiveLineBump, MyPerceptionResponsiveLineBump } from '@/components/LineChart'
 import { categories, products, storages } from "@/data/category"
 import { useState } from "react"
 
@@ -42,6 +42,7 @@ const FormSchema = z.object({
 
 export function GetDataOrder() {
     const [getData, setGetData] = useState<DataProps[]>([]);
+    const [getPerceptionData, setGetPerceptionData] = useState<PerceptionDataProps[]>([]);
     const [isVisible, setIsVisible] = useState(false);
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -54,14 +55,8 @@ export function GetDataOrder() {
             const dataPropsList = await fetch(`/api/add-post?Category=${data.category}&Product=${data.product}&Storage=${data.storage}`, {
                 method: "GET"
             }).then(response => response.json())
-            Object.entries(dataPropsList).forEach(([key, value]) => {
-                if (key == "data") {
-                    dataPropsList["data"].map((dataItem: any) => {
-                        console.log(`dataItem: ${dataItem["id"]} `)
-                    })
-                }
-            })
-            setGetData(dataPropsList["data"]);
+            setGetData(dataPropsList["data"]["returnData"]);
+            setGetPerceptionData(dataPropsList["data"]["anotherData"]);
             setIsVisible(true);
         } catch (error) {
             console.error(`/api/add-post:  ${error}`)
@@ -69,7 +64,7 @@ export function GetDataOrder() {
     }
 
     return (
-        <Card className='w-full '>
+        <Card className='w-full'>
             <CardHeader>
                 <CardTitle>价格跟踪表</CardTitle>
                 <CardDescription>可以看到多个经销商的价格</CardDescription>
@@ -161,7 +156,11 @@ export function GetDataOrder() {
 
             {isVisible &&
                 <CardContent className='w-full h-[400px]'>
+                    {/* <MyResponsiveLineBump data={getData} /> */}
+
                     <MyResponsiveLineBump data={getData} />
+                    <MyPerceptionResponsiveLineBump data={getPerceptionData} />
+
                 </CardContent>
             }
 
