@@ -1,0 +1,27 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pricetracking {
+  id                Int      @id @default(autoincrement())
+  date              DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  product           String   @db.VarChar(255)
+  storage           String   @db.VarChar(255)
+  alp               Int
+  dac               Float
+  dg                Float
+  newDAC            Float
+  marketplace_price Int
+  reseller          Json
+
+  @@unique([date, product, storage], name: "ProductStorageIndex")
+  @@index([date])
+}
