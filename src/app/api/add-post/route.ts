@@ -1,6 +1,6 @@
 import prisma from "@/db";
 import { getDateString } from "@/utils/dateFormat";
-import { Pricetracking, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { DateTime } from 'luxon';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -15,12 +15,12 @@ export async function POST(
     try {
         const content = await request.json();
 
-        // const baseDate = DateTime.fromObject({ year: 1899, month: 12, day: 30 });
+        // const baseDate = DateTime.fromObject({ year: 1900, month: 1, day: 1 }).setLocale("zh-CN").setZone("Asia/Shanghai");
+        const baseDate = DateTime.fromObject({ year: 1899, month: 12, day: 30 });
 
         const pricetrackingData = content.map((item: any) => {
             const pricetracking = {
-                // date: baseDate.plus({ days: item.Date }),
-                date: new Date((item.Date - 25569) * 86400 * 1000),
+                date: baseDate.plus({ days: item.Date }),
                 product: item.Product,
                 storage: item.Storage,
                 alp: item.ALP,
@@ -65,20 +65,7 @@ export async function POST(
             return pricetracking
         })
 
-        // TODO: transaction it
-        for (const item of pricetrackingData) {
-            const pricetrack = await prisma.pricetracking.findFirst({
-                where: {
-                    date: item.date,
-                    product: item.product,
-                    storage: item.storage
-                },
-            })
-            if (!pricetrack) {
-                const Pricetracking = await prisma.pricetracking.create({ data: item })
-            }
-        }
-
+        const createPricetracking = await prisma.pricetracking.createMany({ data: pricetrackingData })
         return NextResponse.json({ status: 200, revalidated: true, now: Date.now() });
     } catch (error) {
         console.error(error);

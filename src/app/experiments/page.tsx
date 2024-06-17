@@ -53,29 +53,12 @@ async function getData(): Promise<Experiment[]> {
     ]
 }
 
-export const metadata: Metadata = {
-    title: "Tasks",
-    description: "A task and issue tracker build using Tanstack Table.",
-}
-
-
-
-export default async function TaskPage() {
-    const tasks = await getData()
+export default async function Experiments() {
+    const data = await getData()
 
     return (
-        <>
-            <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
-                <div className="flex items-center justify-between space-y-2">
-
-                    <h2 className="text-2xl font-bold tracking-tight">Marketplaces Experiments</h2>
-                    <p className="text-muted-foreground">
-                        Here&apos;s a list of Marketplaces experiments!
-                    </p>
-
-                </div>
-                <DataTable data={tasks} columns={columns} />
-            </div>
-        </>
+        <div className="container mx-auto py-10">
+            <DataTable columns={columns} data={data} />
+        </div>
     )
 }
