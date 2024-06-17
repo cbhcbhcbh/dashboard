@@ -2,17 +2,8 @@
 
 import * as React from "react"
 import {
-  AlertCircle,
-  Archive,
-  ArchiveX,
   File,
-  Inbox,
-  MessagesSquare,
-  Search,
   Send,
-  ShoppingCart,
-  Trash2,
-  Users2,
   ChevronRight,
 } from "lucide-react"
 

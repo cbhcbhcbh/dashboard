@@ -112,7 +112,7 @@ export function MyPerceptionResponsiveLineBump(props: { data: PerceptionDataProp
             stacked: false,
             reverse: false
         }}
-        yFormat=" >-.20f"
+        yFormat=" >-.3f"
         axisTop={null}
         axisRight={null}
         axisBottom={{

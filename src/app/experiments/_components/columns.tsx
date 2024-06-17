@@ -1,6 +1,6 @@
 "use client"
 
-import { Ellipsis, ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { Ellipsis } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
 import { Url } from "next/dist/shared/lib/router/router"
 import { Button } from "@/components/ui/button"
