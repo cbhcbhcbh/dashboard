@@ -1,34 +1,11 @@
 "use client"
 
-import { Ellipsis } from "lucide-react"
 import { ColumnDef } from "@tanstack/react-table"
-import { Url } from "next/dist/shared/lib/router/router"
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { statuses } from "../data/data"
 import { DataTableColumnHeader } from "./data-table-column-header"
-
-export type Experiment = {
-    id: string
-    platform: string // 
-    type: "Carry-over" | "New" //  Quota Type 
-    qualified: "Yes" | "Possible" // Qualified
-    status: "Finalized" | "Rollout" | "Temporarily Hold" | "Completed" | "Ongoing" | "Submitted"
-    experiment_id: number
-    owner: "Lucie Lu" | "Kerry Yang" | "Greg Gao"
-    name: string
-    start: string
-    end: string
-    phrase: Url
-}
+import { DataTableRowActions } from "./data-table-row-actions"
+import { Experiment } from "../data/schema"
 
 export const columns: ColumnDef<Experiment>[] = [
     {
@@ -90,7 +67,7 @@ export const columns: ColumnDef<Experiment>[] = [
         }
     },
     {
-        accessorKey: "experiment_id",
+        accessorKey: "experimentID",
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title="Experiment ID" />
         )
@@ -130,30 +107,6 @@ export const columns: ColumnDef<Experiment>[] = [
     },
     {
         id: "actions",
-        cell: ({ row }) => {
-            const experiment = row.original
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <Ellipsis className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(experiment.id)}
-                        >
-                            Copy experiment ID
-                        </DropdownMenuItem>
-                        {/* <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
-                        <DropdownMenuItem>View experiment details</DropdownMenuItem> */}
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
+        cell: ({ row }) => <DataTableRowActions row={row} />
     },
 ]

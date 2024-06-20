@@ -62,7 +62,8 @@ export function MyResponsiveLineBump(props: { data: DataProps[] }) {
             '#FF6347',
             '#008000'
         ]}
-        pointSize={10}
+        // enablePoints={false}
+        pointSize={2}
         pointColor={{ theme: 'background' }}
         pointBorderWidth={2}
         pointBorderColor={{ from: 'serieColor', modifiers: [] }}
@@ -160,7 +161,7 @@ export function MyPerceptionResponsiveLineBump(props: { data: PerceptionDataProp
             '#FF6347',
             '#008000'
         ]}
-        pointSize={10}
+        pointSize={2}
         pointColor={{ theme: 'background' }}
         pointBorderWidth={2}
         pointBorderColor={{ from: 'serieColor', modifiers: [] }}
