@@ -1,3 +1,6 @@
+import { categorySaleType } from "@/app/orders/data/popsales";
+import { PopSales, getPopSalesForItems } from "@/data-access/popSales";
+import { getPriceTrackingAll } from "@/data-access/pricetracking";
 import prisma from "@/db";
 import { getDateString } from "@/utils/dateFormat";
 import { Prisma } from "@prisma/client";
@@ -42,8 +45,6 @@ export async function POST(
                     if (popSale === undefined) {
                         console.log(`item: ${item} reseller: ${item['T2']} date: ${baseDate.plus({ days: item['统计日期'] })} productID: ${item['商品ID']} saleType: ${item['直降/分期']} product: ${item['Sub LoB']}`)
                     }
-
-                    // return popSale
 
                     return [...acc, popSale];
                 }
@@ -153,27 +154,36 @@ export async function GET(request: Request): Promise<NextResponse> {
         const url = new URL(request.url);
         const searchParams = url.searchParams;
         const category = JSON.parse(searchParams.get('Category')!);
+        const reseller = JSON.parse(searchParams.get('Reseller')!);
         const product = JSON.parse(searchParams.get('Product')!);
         const storage = JSON.parse(searchParams.get('Storage')!);
+        const datePicker = JSON.parse(searchParams.get('Date')!);
 
         const categoryList = category.map((cat: any) => cat.value)
+        const resellerList = reseller.map((cat: any) => cat.value)
 
-        const pricetrackings = await prisma.pricetracking.findMany({
-            where: {
-                product: { in: product.map((pdt: any) => pdt.value) },
-                storage: { in: storage.map((pdt: any) => pdt.value) },
-            },
-            select: {
-                date: true,
-                product: true,
-                storage: true,
-                newDAC: true,
-                reseller: true,
-            },
-            orderBy: {
-                date: 'asc',
-            },
-        })
+        // const pricetrackings = await prisma.pricetracking.findMany({
+        //     where: {
+        //         product: { in: product.map((pdt: any) => pdt.value) },
+        //         storage: { in: storage.map((pdt: any) => pdt.value) },
+        //         date: {
+        //             lt: datePicker.to,
+        //             gt: datePicker.from,
+        //         }
+        //     },
+        //     select: {
+        //         date: true,
+        //         product: true,
+        //         storage: true,
+        //         newDAC: true,
+        //         reseller: true,
+        //     },
+        //     orderBy: {
+        //         date: 'asc',
+        //     },
+        // })
+
+        const pricetrackings = await getPriceTrackingAll(product, storage, datePicker)
 
         const returnData: DataProps[] = []
         const returnJson: { [key: string]: { [key: string]: number } } = {}
@@ -200,16 +210,19 @@ export async function GET(request: Request): Promise<NextResponse> {
             Object.entries(resellerJson).forEach(([key, value]) => {
                 if (categoryList.includes(key)) {
                     Object.entries(value as JSON).forEach(([key2, value2]) => {
-                        if (!returnJson[key2]) {
-                            returnJson[key2] = {};
+                        if (resellerList.includes(key2) || resellerList.includes("All")) {
+                            if (!returnJson[key2]) {
+                                returnJson[key2] = {};
+                            }
+
+                            if (value2 !== undefined && typeof value2 === 'number') {
+                                if (!returnJson[key2][getDateString(pricetracking.date)]) {
+                                    returnJson[key2][getDateString(pricetracking.date)] = 0;
+                                }
+                                returnJson[key2][getDateString(pricetracking.date)] += value2
+                            }
                         }
 
-                        if (value2 !== undefined && typeof value2 === 'number') {
-                            if (!returnJson[key2][getDateString(pricetracking.date)]) {
-                                returnJson[key2][getDateString(pricetracking.date)] = 0;
-                            }
-                            returnJson[key2][getDateString(pricetracking.date)] += value2
-                        }
                     })
                 }
             })
@@ -247,8 +260,41 @@ export async function GET(request: Request): Promise<NextResponse> {
 
         })
 
+        const saleTypeList: string[] = []
 
-        return NextResponse.json({ status: 200, revalidated: true, now: Date.now(), data: { returnData: returnData, anotherData: anotherData } });
+        categoryList.map((category: any) => {
+            saleTypeList.push(categorySaleType[category as keyof typeof categorySaleType])
+        })
+
+        const resellerSaleList: string[] = Object.keys(returnJson);
+
+        const popData: PopSalesDataProps[] = []
+        const popJson: { [key: string]: PopSalesDataPoint[] } = {}
+        const popSale: PopSales = {
+            reseller: resellerSaleList,
+            saleType: saleTypeList,
+            product: product.map((pdt: any) => pdt.value),
+        }
+        const popsales = await getPopSalesForItems(popSale, datePicker)
+
+        if (popsales) {
+            popsales.map((popsale) => {
+                const reseller = popsale.reseller
+                if (!popJson[reseller]) {
+                    popJson[reseller] = [];
+                }
+                popJson[reseller].push({ x: getDateString(popsale.date), y: popsale._sum.netPaymentQuantity })
+            })
+
+            Object.entries(popJson).forEach(([key, value]) => {
+                popData.push({
+                    id: key,
+                    data: value,
+                })
+            })
+        }
+
+        return NextResponse.json({ status: 200, revalidated: true, now: Date.now(), data: { returnData: returnData, anotherData: anotherData, popData: popData } });
     } catch (error) {
         console.error(error);
         return NextResponse.json({ status: 303, revalidated: true, now: Date.now() });

@@ -101,7 +101,6 @@ export default function Experiments() {
                     </Button>
                 </div>
             </div>
-            {/* <DataTable data={data} columns={columns} /> */}
             <DataTable data={experimentDetailItems} columns={columns} />
         </div>
     )

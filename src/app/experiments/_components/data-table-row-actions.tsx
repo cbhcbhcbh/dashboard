@@ -1,4 +1,4 @@
-// "use client"
+"use client";
 
 import { DotsHorizontalIcon } from "@radix-ui/react-icons"
 import { Row } from "@tanstack/react-table"
@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { experimentSchema } from "../data/schema"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface DataTableRowActionsProps<TData> {
     row: Row<TData>
@@ -21,6 +22,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
     row,
 }: DataTableRowActionsProps<TData>) {
+    const router = useRouter()
     const experiment = experimentSchema.parse(row.original)
 
     return (
@@ -49,10 +51,19 @@ export function DataTableRowActions<TData>({
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => {
+                    await fetch(`/api/experiment`, {
+                        method: "Delete",
+                        headers: {
+                            "Content-Type": 'application/json'
+                        },
+                        body: JSON.stringify({ id: experiment.id })
+                    });
+                    router.refresh();
+                }}>
                     Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu >
     )
 }

@@ -71,10 +71,13 @@ export async function getAllExperimentDetailItems() {
 }
 
 export async function deleteExperimentDetailItem(id: string) {
-    const deleteUsers = await prisma.experimentDetail.delete({
-        where: {
-            id: id
-        }
-    })
-    return deleteUsers;
+    try {
+        await prisma.experimentDetail.delete({
+            where: {
+                id: id
+            }
+        })
+    } catch (e) {
+        return "An error occurred.";
+    }
 }

@@ -76,6 +76,7 @@ export interface MultipleSelectorRef {
     input: HTMLInputElement;
 }
 
+// 用于在给定的延迟时间内防抖一个值
 export function useDebounce<T>(value: T, delay?: number): T {
     const [debouncedValue, setDebouncedValue] = React.useState<T>(value);
 
@@ -90,6 +91,7 @@ export function useDebounce<T>(value: T, delay?: number): T {
     return debouncedValue;
 }
 
+// 构造成 Group Option
 function transToGroupOption(options: Option[], groupBy?: string) {
     if (options.length === 0) {
         return {};
@@ -112,8 +114,10 @@ function transToGroupOption(options: Option[], groupBy?: string) {
 }
 
 function removePickedOption(groupOption: GroupOption, picked: Option[]) {
+    // groupOption 的深拷贝
     const cloneOption = JSON.parse(JSON.stringify(groupOption)) as GroupOption;
 
+    // 建一个新的数组,该数组只包含 value 属性不在 picked 数组中的 Option 对象
     for (const [key, value] of Object.entries(cloneOption)) {
         cloneOption[key] = value.filter((val) => !picked.find((p) => p.value === val.value));
     }
@@ -183,10 +187,12 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         }: MultipleSelectorProps,
         ref: React.Ref<MultipleSelectorRef>,
     ) => {
+        // 用 React 的 useRef 钩子创建了一个 ref 对象。<HTMLInputElement> 是一个泛型类型参数,它指定了 ref 对象的类型。在这个例子中,它被指定为 HTMLInputElement。
         const inputRef = React.useRef<HTMLInputElement>(null);
         const [open, setOpen] = React.useState(false);
         const [isLoading, setIsLoading] = React.useState(false);
 
+        // value 是这个组件的输入值
         const [selected, setSelected] = React.useState<Option[]>(value || []);
         const [options, setOptions] = React.useState<GroupOption>(
             transToGroupOption(arrayDefaultOptions, groupBy),
@@ -194,6 +200,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
         const [inputValue, setInputValue] = React.useState('');
         const debouncedSearchTerm = useDebounce(inputValue, delay || 500);
 
+        // useImperativeHandle 提供了一种机制,允许我们在函数组件中定义一些命令式的 API,并将其暴露给父组件使用。
         React.useImperativeHandle(
             ref,
             () => ({
@@ -204,6 +211,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             [selected],
         );
 
+        //  当用户需要从选中列表中删除一个选项时,该函数会执行相应的逻辑,更新组件的选中列表状态,并通知父组件选中列表发生了变化
         const handleUnselect = React.useCallback(
             (option: Option) => {
                 const newOptions = selected.filter((s) => s.value !== option.value);
@@ -213,6 +221,9 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
             [onChange, selected],
         );
 
+        // 这段代码定义了一个键盘事件处理程序 handleKeyDown,它主要处理以下情况:
+        // 当输入框为空且选中列表不为空时,按下"Delete"或"Backspace"键会删除最后一个选中选项(除非该选项被标记为固定)。
+        // 当用户按下"Escape"键时,会使输入框失去焦点。
         const handleKeyDown = React.useCallback(
             (e: React.KeyboardEvent<HTMLDivElement>) => {
                 const input = inputRef.current;

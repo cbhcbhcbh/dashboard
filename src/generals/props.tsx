@@ -17,3 +17,13 @@ interface PerceptionDataPoint {
     x: string;
     y: number;
 }
+
+interface PopSalesDataProps {
+    id: string;
+    data: PopSalesDataPoint[];
+}
+
+interface PopSalesDataPoint {
+    x: string;
+    y: number | null;
+}

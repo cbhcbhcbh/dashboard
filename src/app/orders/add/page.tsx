@@ -3,23 +3,24 @@
 import React, { FormEventHandler, useState } from "react";
 import * as XLSX from "xlsx";
 
-import { Button } from "./ui/button";
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Form, FormLabel } from "./ui/form";
+import { useRouter } from "next/navigation";
 
 
 const acceptableCSVFileTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv";
 
 
-export function HandleeExcel() {
+export default function HandleeExcel() {
+
+    const router = useRouter()
 
     const [excelFile, setExcelFile] = useState<string | ArrayBuffer | null>(null);
     const [typeError, setTypeError] = useState<string | null>(null);
@@ -62,6 +63,7 @@ export function HandleeExcel() {
             } catch (error) {
                 console.error(`/api/add-post:  ${error}`)
             }
+            router.push("/orders")
         } else {
             console.log("handleFileSubmit Error");
         }
