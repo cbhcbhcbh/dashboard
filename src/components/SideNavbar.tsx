@@ -47,6 +47,13 @@ export function SideNavbar({
           //   variant: "default",
           //   href: "#",
           // },
+          // 手工报数汇总
+          {
+            title: "手工报数汇总",
+            icon: File,
+            variant: "ghost",
+            href: "/manualReporting",
+          },
           {
             title: "Orders",
             icon: File,

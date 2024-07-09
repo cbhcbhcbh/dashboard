@@ -104,6 +104,9 @@ const MultipleSelectorWithForm = () => {
                 console.log(`dataPropsList["data"]["popData"]: ${dataPropsList["data"]["popData"]}`)
                 setIsVisiblePop(true);
                 setGetPopSalesData(dataPropsList["data"]["popData"]);
+            } else {
+                setIsVisiblePop(false);
+                setGetPopSalesData([]);
             }
             setIsVisible(true);
         } catch (error) {
@@ -283,15 +286,12 @@ const MultipleSelectorWithForm = () => {
             {isVisible &&
                 <CardContent className='w-full h-[400px]'>
                     {/* <MyResponsiveLineBump data={getData} /> */}
-
-                    <MyResponsiveLineBump data={getData} />
-                    {/* <MyPerceptionResponsiveLineBump data={getPerceptionData} /> */}
-                    <PerceptionTable data={getPerceptionData} />
-
+                    <PerceptionTable data={getData} />
+                    <MyPerceptionResponsiveLineBump data={getPerceptionData} />
+                    {/* <PerceptionTable data={getPerceptionData} /> */}
                     {IsVisiblePop &&
                         <MyPopResponsiveLineBump data={getPopSalesData} />
                     }
-
                 </CardContent>
             }
 

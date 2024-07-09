@@ -211,7 +211,7 @@ export function MyPopResponsiveLineBump(props: { data: PopSalesDataProps[] }) {
             stacked: false,
             reverse: false
         }}
-        yFormat=" >-.3f"
+        yFormat=" >-.0f"
         axisTop={null}
         axisRight={null}
         axisBottom={{

@@ -162,27 +162,6 @@ export async function GET(request: Request): Promise<NextResponse> {
         const categoryList = category.map((cat: any) => cat.value)
         const resellerList = reseller.map((cat: any) => cat.value)
 
-        // const pricetrackings = await prisma.pricetracking.findMany({
-        //     where: {
-        //         product: { in: product.map((pdt: any) => pdt.value) },
-        //         storage: { in: storage.map((pdt: any) => pdt.value) },
-        //         date: {
-        //             lt: datePicker.to,
-        //             gt: datePicker.from,
-        //         }
-        //     },
-        //     select: {
-        //         date: true,
-        //         product: true,
-        //         storage: true,
-        //         newDAC: true,
-        //         reseller: true,
-        //     },
-        //     orderBy: {
-        //         date: 'asc',
-        //     },
-        // })
-
         const pricetrackings = await getPriceTrackingAll(product, storage, datePicker)
 
         const returnData: DataProps[] = []
@@ -248,7 +227,7 @@ export async function GET(request: Request): Promise<NextResponse> {
                 if (!tempDataProps.id && tempDataProps.id !== key) {
                     tempDataProps.id = key
                 }
-                tempDataProps.data.push({ x: key1, y: value1 } as DataPoint)
+                tempDataProps.data.push({ x: key1, y: Math.round(value1) } as DataPoint)
 
                 if (!tempAnotherDataProps.id && tempAnotherDataProps.id !== key) {
                     tempAnotherDataProps.id = key

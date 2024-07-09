@@ -67,3 +67,96 @@ model PopSale {
   @@unique(name: "POPSaleUniqueIndex", [reseller, date, productID, saleType, product])
   @@index([reseller, saleType, product, date])
 }
+
+model Fy24STData {
+  id                Int    @id @default(autoincrement())
+  generalAgent      String
+  hqID              Int
+  hqName            String
+  className         String
+  subClass          String
+  mpn               String
+  marketingPartName String
+  businessModule    String // 业务模块
+  initialEOH        Int // 期初EOH
+  distribution      Int // 本周分货
+  endEOH            Int // 期末EOH
+  actualEOH         Int // 实际EOH
+  ltd               Int
+  fy23Q4STQTD       Int // FY23 Q4 ST QTD
+  q1STQTD           Int
+  q2STQTD           Int
+  q3STQTD           Int
+  q4STQTD           Int
+  st5WeekAve        Float
+  woi               Float
+
+  fy23stQ4WK13 Int
+  stQ1WK1      Int
+  stQ1WK2      Int
+  stQ1WK3      Int
+  stQ1WK4      Int
+  stQ1WK5      Int
+  stQ1WK6      Int
+  stQ1WK7      Int
+  stQ1WK8      Int
+  stQ1WK9      Int
+  stQ1WK10     Int
+  stQ1WK11     Int
+  stQ1WK12     Int
+  stQ1WK13     Int
+  stQ2WK1      Int
+  stQ2WK2      Int
+  stQ2WK3      Int
+  stQ2WK4      Int
+  stQ2WK5      Int
+  stQ2WK6      Int
+  stQ2WK7      Int
+  stQ2WK8      Int
+  stQ2WK9      Int
+  stQ2WK10     Int
+  stQ2WK11     Int
+  stQ2WK12     Int
+  stQ2WK13     Int
+  stQ3WK1      Int
+  stQ3WK2      Int
+  stQ3WK3      Int
+  stQ3WK4      Int
+  stQ3WK5      Int
+  stQ3WK6      Int
+  stQ3WK7      Int
+  stQ3WK8      Int
+  stQ3WK9      Int
+  stQ3WK10     Int
+  stQ3WK11     Int
+  stQ3WK12     Int
+  stQ3WK13     Int
+  stQ4WK1      Int
+  stQ4WK2      Int
+  stQ4WK3      Int
+  stQ4WK4      Int
+  stQ4WK5      Int
+  stQ4WK6      Int
+  stQ4WK7      Int
+  stQ4WK8      Int
+  stQ4WK9      Int
+  stQ4WK10     Int
+  stQ4WK11     Int
+  stQ4WK12     Int
+  stQ4WK13     Int
+
+  current String
+
+  createdAt DateTime @default(now()) @db.Date
+  updatedAt DateTime @updatedAt @db.Date
+
+  @@unique(name: "STDataUniqueIndex", [generalAgent, businessModule, hqName, className, subClass, mpn])
+  @@index([className, subClass])
+}
+
+model generalAgentHQMappingTable {
+  id             Int    @id @default(autoincrement())
+  hqName         String
+  generalAgent   String
+  businessModule String // 业务模块
+}
